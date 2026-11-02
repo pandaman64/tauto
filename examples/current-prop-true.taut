@@ -1,0 +1,23 @@
+// 命題をデータの型引数に置いた族。`tauto check examples/current-prop-true.taut` は通る。
+// `Prop` は `Type` 以下なので、kernel は `Pack(True)` を受け入れる。
+// `tauto run` はできない。`held` の結果型を出すとき、抽出は `True` をデータの型として書かず、
+// `` `True` はデータの型ではない `` で拒否する。
+
+fn id(A: Type, x: A): A { x }
+
+inductive Pack(A: Type): Type { Mk(x: A, h: x = x): Pack(A) }
+
+fn pack_id(A: Type, x: A): Pack(A) { Mk(x, Refl) }
+
+fn unpack(A: Type, p: Pack(A)): A { match p: A { Mk(x, h) => x } }
+
+fn pack_true(h: True): Pack(True) { pack_id(True, h) }
+
+fn held(): Pack(True) { pack_true(Trivial) }
+
+fn show_held(): () {
+  let _ := held()
+  perform show("held", 1)
+}
+
+show_held()

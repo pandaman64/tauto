@@ -1,0 +1,10 @@
+// カーネルが検査する証明。
+// `tauto check examples/current-proof.taut`
+
+theorem two_plus_two(): Eq(Nat, 2 + 2, 4) {
+  Refl
+}
+
+theorem and_swap(A: Prop, B: Prop, p: And(A, B)): And(B, A) {
+  AndIntro(And::right(p), And::left(p))
+}

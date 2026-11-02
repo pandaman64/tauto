@@ -1,0 +1,29 @@
+// 自然数の和の可換性。帰納法は `Nat` に対する `match` で、
+// マッチした値のフィールドへの再帰呼び出しが帰納法の仮定になる。
+// `+` は右の引数で計算する。`a + 0` は `a`、`a + Succ(k)` は `Succ(a + k)`。
+// 左に足す方は定義では動かないので、補題を帰納法で示す。
+// `tauto check examples/current-add-comm.taut`
+
+theorem add_zero_left(n: Nat): 0 + n = n {
+  match n: 0 + n = n {
+    Zero => Refl
+    Succ(k) => Eq::congr(Succ, add_zero_left(k))
+  }
+}
+
+theorem add_succ_left(a: Nat, b: Nat): Succ(a) + b = Succ(a + b) {
+  match b: Succ(a) + b = Succ(a + b) {
+    Zero => Refl
+    Succ(k) => Eq::congr(Succ, add_succ_left(a, k))
+  }
+}
+
+theorem add_comm(a: Nat, b: Nat): a + b = b + a {
+  match b: a + b = b + a {
+    Zero => Eq::sym(add_zero_left(a))
+    Succ(k) => calc Succ(a + k) {
+      = Succ(k + a) from Eq::congr(Succ, add_comm(a, k))
+      = Succ(k) + a from Eq::sym(add_succ_left(k, a))
+    }
+  }
+}
