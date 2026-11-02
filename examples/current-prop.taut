@@ -1,0 +1,36 @@
+// 証明は実行時の値にならない。型引数 `A: Type` の値は残る。
+// 命題を受け取る引数 `h: P` と、データの証明フィールドは消える。
+// `tauto run examples/current-prop.taut`
+// `tauto run --backend rust examples/current-prop.taut` も同じ行を出す。
+//
+// 実行側の呼び出しは、抽出後の引数だけを書く。`id` の型引数はジェネリクスになるので `id(1)`。
+// `from_true` と `from_id` は証明を受け取るので、検査されないコードからは呼べない。
+// `one` と `one_id` が証明を渡し、戻るのは `Nat` だけ。
+// `Pack(True)` は `examples/current-prop-true.taut`。`tauto check` は通り、`tauto run` は拒否する。
+
+fn id(A: Type, x: A): A { x }
+
+inductive Pack(A: Type): Type { Mk(x: A, h: x = x): Pack(A) }
+
+fn pack_id(A: Type, x: A): Pack(A) { Mk(x, Refl) }
+
+fn unpack(A: Type, p: Pack(A)): A { match p: A { Mk(x, h) => x } }
+
+fn from_pack(n: Nat): Nat { unpack(Nat, pack_id(Nat, n)) }
+
+fn from_true(h: True): Nat { match h: Nat { Trivial => Succ(Zero) } }
+
+fn from_id(h: True): Nat { match id(True, h): Nat { Trivial => Succ(Zero) } }
+
+fn one(): Nat { from_true(Trivial) }
+
+fn one_id(): Nat { from_id(Trivial) }
+
+theorem same(n: Nat): id(n = n, Refl) = Refl { Refl }
+
+fn show_nat(name: Text, n: Nat): () { perform show(name, n) }
+
+show_nat("packed", from_pack(Succ(Succ(Zero))))
+show_nat("id", id(Succ(Zero)))
+show_nat("one", one())
+show_nat("one_id", one_id())
