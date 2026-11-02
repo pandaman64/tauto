@@ -1,0 +1,16 @@
+// 効果とハンドラ。`ask` は継続を二度再開する。
+// `tauto run examples/current-ask.taut`
+// `tauto run --backend rust examples/current-ask.taut`
+
+effect ask(n: i64): i64 resume ω
+
+let c := handle { perform ask(5) + 1 } with {
+  ask(n), k => k(n) + k(n + 1)
+  return v => v
+}
+let d := handle { budget(steps: 3) { 7 } } with {
+  exceeded(info), k => info.more(100)
+}
+
+perform show("c", c)
+perform show("d", d)

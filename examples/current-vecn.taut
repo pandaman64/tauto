@@ -1,0 +1,41 @@
+// 長さを添字に持つベクタ。`tauto check examples/current-vecn.taut` は通る。
+// `tauto run` はできない。添字のある帰納族は実行対象のデータの族になれず、
+// `tauto_lib::examples::current_vecn::Vec` にはインデックスがある。データの族はパラメータだけを持つ、で拒否される。
+// 組み込みの `+` は右の引数で再帰するので `Zero + m` は `m` にならない。
+// 連結の添字には、左で再帰する `plus` を使う。
+
+inductive Vec(A: Type): (Nat) -> Type {
+  Nil: Vec(A, Zero)
+  Cons(n: Nat, x: A, xs: Vec(A, n)): Vec(A, Succ(n))
+}
+
+fn plus(n: Nat, m: Nat): Nat {
+  match n: Nat {
+    Zero => m
+    Succ(k) => Succ(plus(k, m))
+  }
+}
+
+fn head<A>(n: Nat, v: Vec(A, Succ(n))): A {
+  match v: A {
+    Cons(k, x, xs) => x
+  }
+}
+
+fn append<A>(n: Nat, m: Nat, xs: Vec(A, n), ys: Vec(A, m)): Vec(A, plus(n, m)) {
+  match xs: Vec(A, plus(n, m)) {
+    Nil => ys
+    Cons(k, x, rest) => Cons(plus(k, m), x, append(k, m, rest, ys))
+  }
+}
+
+theorem head_cons<A>(n: Nat, x: A, xs: Vec(A, n)): head(n, Cons(n, x, xs)) = x {
+  Refl
+}
+
+fn demo(): i64 {
+  let left := Cons(Zero, 10, Nil)
+  let right := Cons(Zero, 20, Nil)
+  let joined := append(Succ(Zero), Succ(Zero), left, right)
+  head(Succ(Zero), joined)
+}

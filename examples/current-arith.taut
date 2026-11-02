@@ -1,0 +1,10 @@
+// 関数と束縛。戻り値は `:`、束縛は `:=`。
+// `tauto run examples/current-arith.taut`
+
+fn twice(f: (i64) -> i64, x: i64): i64 { f(f(x)) }
+
+let a := 1 + 2 * 3
+let b := twice(x => x + 10, 1)
+
+perform show("a", a)
+perform show("b", b)

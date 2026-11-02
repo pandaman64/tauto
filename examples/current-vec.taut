@@ -1,0 +1,15 @@
+// 所有する `Vec`。範囲外は再開しない効果。
+// `tauto run examples/current-vec.taut`
+
+import std::prelude::Affine
+
+var v := Vec::new()
+Vec::push(&mut v, 3)
+Vec::push(&mut v, 4)
+Vec::push(&mut v, 5)
+let n := Vec::len(&v)
+let first := handle { Vec::index(&v, 0) } with {
+  out_of_bounds() => 0
+}
+perform show("len", n)
+perform show("first", first)
